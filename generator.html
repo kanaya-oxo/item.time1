@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>時計ジェネレータ</title>
+  <style>
+    body {
+      font-family: 'IBM Plex Mono', monospace;
+      display: flex;
+      margin: 0;
+ padding: 20px;
+      height: 100vh;
+ gap: 20px;
+    }
+    .left, .right {
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .left {
+      width: 50%;
+      overflow-y: auto;
+    }
+    .right {
+      width: 50%;
+      background: #f0f0f0;
+    }
+    .preview {
+      width: 400px;
+      height: 400px;
+      background: repeating-conic-gradient(#ccc 0% 25%, #fff 0% 50%) 0/20px 20px;
+      position: relative;
+    }
+    .preview canvas, .preview div {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .bg-options img {
+      width: 100px;
+      margin-right: 10px;
+      vertical-align: middle;
+    }
+#previewClock div {
+      text-align: center;
+      -webkit-text-stroke: 1px white;
+    }
+  </style>
+</head>
+<body>
+
+<div class="left">
+  <h1>時計ジェネレータ</h1>
+  
+  <h2>背景画像選択</h2>
+  <div class="bg-options">
+    <label><input type="radio" name="bg" value="A" checked><img src="assets/A_BG.png"></label>
+    <label><input type="radio" name="bg" value="B"><img src="assets/B_BG.png"></label>
+    <label><input type="radio" name="bg" value="C"><img src="assets/C_BG.png"></label>
+  </div>
+
+  <h2>表示設定</h2>
+  <label><input type="checkbox" id="showSec" checked> 秒表示</label><br>
+  <label><input type="checkbox" id="showDate" checked> 年・日付・曜日 表示</label><br>
+  <label><input type="checkbox" id="showYear" checked> 年表示</label><br>
+  <label><input type="checkbox" id="showWeekday" checked> 曜日表示</label>
+
+  <h2>文字設定</h2>
+  <label>時刻文字サイズ：<input type="number" id="timeFontSize" value="48"> px</label><br>
+  <label>日付文字サイズ：<input type="number" id="dateFontSize" value="24"> px</label><br>
+  <label>文字色：<input type="color" id="fontColor" value="#ffffff"></label>
+
+  <h2>線画色グラデーション</h2>
+  <input type="color" id="lineColor1" value="#ffffff">
+  <input type="color" id="lineColor2" value="#0000ff">
+
+  <h2>塗り色グラデーション</h2>
+  <input type="color" id="fillColor1" value="#ffcccc">
+  <input type="color" id="fillColor2" value="#ccffff">
+
+  <h2>表示位置調整</h2>
+  <label>上からの距離：<input type="number" id="topOffset" value="0"> px</label>
+  
+  <br><br>
+  <button onclick="generateURL()">URLを生成＆コピー</button>
+</div>
+
+<div class="right">
+  <h2>プレビュー</h2>
+  <div class="preview">
+    <canvas id="previewCanvas" width="400" height="400"></canvas>
+    <div id="previewClock"></div>
+  </div>
+</div>
+
+<script src="js/generator.js"></script>
+</body>
+</html>

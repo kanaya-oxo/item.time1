@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>OBS カスタム時計</title>
+ <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+ font-family: 'IBM Plex Mono', monospace;
+    }
+
+    body {
+      background: black;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+ margin: 0;
+      overflow: hidden;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    #overlay {
+      position: absolute;
+      inset: 0;
+      background-color: transparent;
+      mix-blend-mode: multiply;
+      z-index: 0;
+    }
+
+    #clock {
+      z-index: 1;
+      font-family: 'Segoe UI', sans-serif;
+      font-weight: bold;
+      font-size: 80px;
+      background: linear-gradient(90deg, #ffffff, #00ffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      text-align: center;
+      -webkit-text-stroke: 2px black;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay"></div>
+  <div id="clock">--:--:--</div>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('ja-JP', { hour12: false });
+      document.getElementById("clock").textContent = timeStr;
+    }
+
+    function applyStyles() {
+      const params = new URLSearchParams(window.location.search);
+
+      // 背景画像
+      const bgImage = params.get("bgImage");
+      if (bgImage) {
+        document.body.style.backgroundImage = `url(${bgImage})`;
+      }
+
+      // 乗算色
+      const multiplyColor = params.get("multiply") || "transparent";
+      document.getElementById("overlay").style.backgroundColor = multiplyColor;
+
+      // フォントサイズ
+      const size = params.get("size");
+      if (size) {
+        document.getElementById("clock").style.fontSize = `${size}px`;
+      }
+
+      // グラデーション
+      const gradFrom = params.get("gradFrom") || "#ffffff";
+      const gradTo = params.get("gradTo") || "#00ffff";
+      document.getElementById("clock").style.background = `linear-gradient(90deg, ${gradFrom}, ${gradTo})`;
+    }
+
+    applyStyles();
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
+</body>
+</html>
