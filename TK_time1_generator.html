@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>時計URLジェネレーター</title>
+</head>
+<body>
+  <h1>OBS時計カスタムURLジェネレーター</h1>
+  <form id="form">
+    <label>背景画像URL：<input type="text" id="bgImage"></label><br>
+    <label>乗算カラー（rgba）：<input type="text" id="multiply" value="rgba(0,0,0,0.5)"></label><br>
+    <label>文字サイズ（px）：<input type="number" id="size" value="80"></label><br>
+    <label>グラデーション開始色：<input type="color" id="gradFrom" value="#00ffcc"></label><br>
+    <label>グラデーション終了色：<input type="color" id="gradTo" value="#ff00ff"></label><br>
+    <button type="submit">URL生成</button>
+  </form>
+
+  <p>生成されたURL：</p>
+  <textarea id="output" rows="4" cols="80" readonly></textarea>
+
+  <script>
+    document.getElementById('form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const base = 'https://yourdomain.com/index.html'; // ← ここはデプロイ先のURLに変えてください
+
+      const params = new URLSearchParams();
+      params.set('bgImage', document.getElementById('bgImage').value);
+      params.set('multiply', document.getElementById('multiply').value);
+      params.set('size', document.getElementById('size').value);
+      params.set('gradFrom', document.getElementById('gradFrom').value);
+      params.set('gradTo', document.getElementById('gradTo').value);
+
+      document.getElementById('output').value = `${base}?${params.toString()}`;
+    });
+  </script>
+</body>
+</html>
