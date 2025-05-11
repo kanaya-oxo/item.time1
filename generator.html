@@ -2,32 +2,41 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>OBS時計ジェネレーター</title>
+  <title>OBS時計カスタムジェネレーター</title>
   <style>
+    body {
+      font-family: sans-serif;
+    }
+
     #preview {
-      width: 400px;
-      height: 200px;
-      margin: 20px 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 40px;
-      font-family: monospace;
-      background-size: cover;
-      background-position: center;
+      width: 350px;
       position: relative;
+      margin-top: 20px;
+      border: 1px solid #aaa;
+    }
+
+    #previewImage {
+      width: 100%;
+      display: block;
     }
 
     #previewOverlay {
       position: absolute;
       inset: 0;
       mix-blend-mode: multiply;
+      z-index: 1;
       pointer-events: none;
     }
 
     #previewText {
-      z-index: 1;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: bold;
+      font-size: 48px;
+      z-index: 2;
+      white-space: nowrap;
       background: linear-gradient(90deg, #00ffcc, #ff00ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -35,11 +44,11 @@
 
     .thumbnail {
       width: 80px;
-      height: 50px;
-      object-fit: cover;
+      height: 60px;
+      object-fit: contain;
       border: 2px solid transparent;
       cursor: pointer;
-      margin: 5px;
+      margin: 4px;
     }
 
     .selected {
@@ -48,40 +57,33 @@
   </style>
 </head>
 <body>
-  <h1>OBS 時計カスタム URL ジェネレーター</h1>
+  <h1>OBS 時計 URL ジェネレーター</h1>
 
   <form id="form">
-    <div>
-      <label>文字サイズ：
-        <input type="number" id="size" value="80">
-      </label>
-    </div>
+    <label>文字サイズ（px）：
+      <input type="number" id="size" value="48">
+    </label><br><br>
 
-    <div>
-      <label>グラデーション開始色：
-        <input type="color" id="gradFrom" value="#00ffcc">
-      </label>
-      <label>終了色：
-        <input type="color" id="gradTo" value="#ff00ff">
-      </label>
-    </div>
+    <label>グラデーション開始色：
+      <input type="color" id="gradFrom" value="#00ffcc">
+    </label>
 
-    <div>
-      <label>乗算カラー（rgba）：
-        <input type="text" id="multiply" value="rgba(0,0,0,0.4)">
-      </label>
-    </div>
+    <label>終了色：
+      <input type="color" id="gradTo" value="#ff00ff">
+    </label><br><br>
 
-    <div>
-      <p>背景画像を選択：</p>
-      <div id="bgSelector"></div>
-    </div>
+    <label>背景の乗算カラー（例: rgba(0,0,0,0.3)）：
+      <input type="text" id="multiply" value="rgba(0,0,0,0.3)">
+    </label><br><br>
 
-    <h3>プレビュー</h3>
+    <p>背景画像：</p>
+    <div id="bgSelector"></div>
+
     <div id="preview">
+      <img id="previewImage" src="" alt="背景画像">
       <div id="previewOverlay"></div>
       <div id="previewText">12:34:56</div>
-    </div>
+    </div><br>
 
     <button type="submit">URL生成</button>
   </form>
@@ -91,37 +93,34 @@
 
   <script>
     const bgImages = [
-      { name: "背景1", url: "https://yourcdn.com/bg1.png" },
-      { name: "背景2", url: "https://yourcdn.com/bg2.png" },
-      { name: "背景3", url: "https://yourcdn.com/bg3.png" }
+      { name: "背景1", url: "https://kanaya-oxo.github.io/assets/bg1.png" },
+      { name: "背景2", url: "https://kanaya-oxo.github.io/assets/bg1.png" },
+      { name: "背景3", url: "https://kanaya-oxo.github.io/assets/bg1.png" }
     ];
 
     let selectedBg = bgImages[0].url;
 
     function updatePreview() {
-      const size = document.getElementById("size").value;
       const gradFrom = document.getElementById("gradFrom").value;
       const gradTo = document.getElementById("gradTo").value;
+      const size = document.getElementById("size").value;
       const multiply = document.getElementById("multiply").value;
 
-      const preview = document.getElementById("preview");
-      preview.style.backgroundImage = `url(${selectedBg})`;
-
-      const overlay = document.getElementById("previewOverlay");
-      overlay.style.backgroundColor = multiply;
+      document.getElementById("previewImage").src = selectedBg;
+      document.getElementById("previewOverlay").style.backgroundColor = multiply;
 
       const text = document.getElementById("previewText");
-      text.style.fontSize = `${size}px`;
       text.style.background = `linear-gradient(90deg, ${gradFrom}, ${gradTo})`;
+      text.style.fontSize = `${size}px`;
     }
 
-    function initBackgroundSelector() {
+    function initBgSelector() {
       const container = document.getElementById("bgSelector");
-      bgImages.forEach((img, index) => {
+      bgImages.forEach((img, idx) => {
         const thumb = document.createElement("img");
         thumb.src = img.url;
-        thumb.classList.add("thumbnail");
-        if (index === 0) thumb.classList.add("selected");
+        thumb.className = "thumbnail";
+        if (idx === 0) thumb.classList.add("selected");
 
         thumb.addEventListener("click", () => {
           selectedBg = img.url;
@@ -141,7 +140,7 @@
     document.getElementById("form").addEventListener("submit", function (e) {
       e.preventDefault();
 
-      const base = 'https://yourdomain.com/index.html'; // ←デプロイ先に合わせて変更
+      const base = 'https://kanaya-oxo.github.io/item.time1/'; // ← 実際のデプロイURLに変更
       const params = new URLSearchParams();
 
       params.set("bgImage", selectedBg);
@@ -153,7 +152,7 @@
       document.getElementById("output").value = `${base}?${params.toString()}`;
     });
 
-    initBackgroundSelector();
+    initBgSelector();
     updatePreview();
   </script>
 </body>
