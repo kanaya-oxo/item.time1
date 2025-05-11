@@ -2,36 +2,159 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>時計URLジェネレーター</title>
+  <title>OBS時計ジェネレーター</title>
+  <style>
+    #preview {
+      width: 400px;
+      height: 200px;
+      margin: 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 40px;
+      font-family: monospace;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+    }
+
+    #previewOverlay {
+      position: absolute;
+      inset: 0;
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    #previewText {
+      z-index: 1;
+      background: linear-gradient(90deg, #00ffcc, #ff00ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .thumbnail {
+      width: 80px;
+      height: 50px;
+      object-fit: cover;
+      border: 2px solid transparent;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+    .selected {
+      border-color: red;
+    }
+  </style>
 </head>
 <body>
-  <h1>OBS時計カスタムURLジェネレーター</h1>
+  <h1>OBS 時計カスタム URL ジェネレーター</h1>
+
   <form id="form">
-    <label>背景画像URL：<input type="text" id="bgImage"></label><br>
-    <label>乗算カラー（rgba）：<input type="text" id="multiply" value="rgba(0,0,0,0.5)"></label><br>
-    <label>文字サイズ（px）：<input type="number" id="size" value="80"></label><br>
-    <label>グラデーション開始色：<input type="color" id="gradFrom" value="#00ffcc"></label><br>
-    <label>グラデーション終了色：<input type="color" id="gradTo" value="#ff00ff"></label><br>
+    <div>
+      <label>文字サイズ：
+        <input type="number" id="size" value="80">
+      </label>
+    </div>
+
+    <div>
+      <label>グラデーション開始色：
+        <input type="color" id="gradFrom" value="#00ffcc">
+      </label>
+      <label>終了色：
+        <input type="color" id="gradTo" value="#ff00ff">
+      </label>
+    </div>
+
+    <div>
+      <label>乗算カラー（rgba）：
+        <input type="text" id="multiply" value="rgba(0,0,0,0.4)">
+      </label>
+    </div>
+
+    <div>
+      <p>背景画像を選択：</p>
+      <div id="bgSelector"></div>
+    </div>
+
+    <h3>プレビュー</h3>
+    <div id="preview">
+      <div id="previewOverlay"></div>
+      <div id="previewText">12:34:56</div>
+    </div>
+
     <button type="submit">URL生成</button>
   </form>
 
   <p>生成されたURL：</p>
-  <textarea id="output" rows="4" cols="80" readonly></textarea>
+  <textarea id="output" rows="3" cols="80" readonly></textarea>
 
   <script>
-    document.getElementById('form').addEventListener('submit', function(e) {
-      e.preventDefault();
-      const base = 'https://yourdomain.com/index.html'; // ← ここはデプロイ先のURLに変えてください
+    const bgImages = [
+      { name: "青空", url: "https://yourcdn.com/bg1.jpg" },
+      { name: "宇宙", url: "https://yourcdn.com/bg2.jpg" },
+      { name: "草原", url: "https://yourcdn.com/bg3.jpg" }
+    ];
 
-      const params = new URLSearchParams();
-      params.set('bgImage', document.getElementById('bgImage').value);
-      params.set('multiply', document.getElementById('multiply').value);
-      params.set('size', document.getElementById('size').value);
-      params.set('gradFrom', document.getElementById('gradFrom').value);
-      params.set('gradTo', document.getElementById('gradTo').value);
+    let selectedBg = bgImages[0].url;
 
-      document.getElementById('output').value = `${base}?${params.toString()}`;
+    function updatePreview() {
+      const size = document.getElementById("size").value;
+      const gradFrom = document.getElementById("gradFrom").value;
+      const gradTo = document.getElementById("gradTo").value;
+      const multiply = document.getElementById("multiply").value;
+
+      const preview = document.getElementById("preview");
+      preview.style.backgroundImage = `url(${selectedBg})`;
+
+      const overlay = document.getElementById("previewOverlay");
+      overlay.style.backgroundColor = multiply;
+
+      const text = document.getElementById("previewText");
+      text.style.fontSize = `${size}px`;
+      text.style.background = `linear-gradient(90deg, ${gradFrom}, ${gradTo})`;
+    }
+
+    function initBackgroundSelector() {
+      const container = document.getElementById("bgSelector");
+      bgImages.forEach((img, index) => {
+        const thumb = document.createElement("img");
+        thumb.src = img.url;
+        thumb.classList.add("thumbnail");
+        if (index === 0) thumb.classList.add("selected");
+
+        thumb.addEventListener("click", () => {
+          selectedBg = img.url;
+          document.querySelectorAll(".thumbnail").forEach(el => el.classList.remove("selected"));
+          thumb.classList.add("selected");
+          updatePreview();
+        });
+
+        container.appendChild(thumb);
+      });
+    }
+
+    document.querySelectorAll("input").forEach(input => {
+      input.addEventListener("input", updatePreview);
     });
+
+    document.getElementById("form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const base = 'https://yourdomain.com/index.html'; // ←デプロイ先に合わせて変更
+      const params = new URLSearchParams();
+
+      params.set("bgImage", selectedBg);
+      params.set("multiply", document.getElementById("multiply").value);
+      params.set("size", document.getElementById("size").value);
+      params.set("gradFrom", document.getElementById("gradFrom").value);
+      params.set("gradTo", document.getElementById("gradTo").value);
+
+      document.getElementById("output").value = `${base}?${params.toString()}`;
+    });
+
+    initBackgroundSelector();
+    updatePreview();
   </script>
 </body>
 </html>
